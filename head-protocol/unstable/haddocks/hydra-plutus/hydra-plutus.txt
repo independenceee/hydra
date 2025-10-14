@@ -6,12 +6,14 @@
 --   
 --   Hydra Plutus Contracts
 @package hydra-plutus
-@version 0.22.4
+@version 1.0.0
 
 
 -- | Simple asserting validators that are primarily useful for testing.
 module Hydra.Contract.Dummy
 dummyValidatorScript :: PlutusScript
+alwaysFailingScript :: () -> () -> ScriptContext -> Bool
+dummyValidatorScriptAlwaysFails :: PlutusScript
 dummyMintingScript :: PlutusScript
 dummyRewardingScript :: PlutusScript
 
