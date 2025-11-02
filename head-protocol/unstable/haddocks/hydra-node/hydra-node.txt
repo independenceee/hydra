@@ -4,7 +4,7 @@
 
 -- | The Hydra node
 @package hydra-node
-@version 1.0.0
+@version 1.1.0
 
 module Hydra.API.ClientInput
 data ClientInput tx
@@ -3683,6 +3683,7 @@ outputFileParser :: Parser FilePath
 defaultPublishOptions :: PublishOptions
 defaultDirectOptions :: DirectOptions
 defaultBlockfrostOptions :: BlockfrostOptions
+defaultBFQueryTimeout :: Int
 chainBackendOptionsParser :: Parser ChainBackendOptions
 cardanoSigningKeyFileParser :: Parser FilePath
 genFilePath :: String -> Gen FilePath

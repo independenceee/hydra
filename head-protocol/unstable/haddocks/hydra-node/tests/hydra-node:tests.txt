@@ -4,7 +4,7 @@
 
 -- | The Hydra node
 @package hydra-node:tests
-@version 1.0.0
+@version 1.1.0
 
 module Hydra.API.ClientInputSpec
 spec :: Spec
@@ -34,6 +34,9 @@ waitForValue :: HasCallStack => PortNumber -> (Value -> Maybe ()) -> IO ()
 waitMatch :: HasCallStack => Natural -> Connection -> (Value -> Maybe a) -> IO a
 shouldSatisfyAll :: forall a. HasCallStack => Show a => [a] -> [a -> Bool] -> Expectation
 genStateEventForApi :: Gen (StateEvent SimpleTx)
+
+module Hydra.AccumulatorSpec
+spec :: Spec
 
 module Hydra.Chain.Direct.HandlersSpec
 genTimeHandleWithSlotInsideHorizon :: Gen (TimeHandle, SlotNo)
