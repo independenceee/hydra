@@ -4,7 +4,7 @@
 
 -- | TUI for managing a Hydra node
 @package hydra-tui
-@version 1.1.0
+@version 1.2.0
 
 module Hydra.TUI.Drawing.Utils
 drawHex :: SerialiseAsRawBytes a => a -> Widget n
@@ -69,15 +69,15 @@ style :: s -> AttrMap
 
 module Hydra.TUI.Options
 data Options
-Options :: Host -> SocketPath -> NetworkId -> FilePath -> Options
+Options :: Host -> Either FilePath SocketPath -> NetworkId -> FilePath -> Options
 [hydraNodeHost] :: Options -> Host
-[cardanoNodeSocket] :: Options -> SocketPath
+[cardanoConnection] :: Options -> Either FilePath SocketPath
 [cardanoNetworkId] :: Options -> NetworkId
 
 -- | User key used by the tui client to commit
 [cardanoSigningKey] :: Options -> FilePath
 parseOptions :: Parser Options
-parseCardanoNodeSocket :: Parser SocketPath
+parsecardanoConnection :: Parser (Either FilePath SocketPath)
 parseNodeHost :: Parser Host
 parseCardanoSigningKey :: Parser FilePath
 instance GHC.Show.Show Hydra.TUI.Options.Options
@@ -150,15 +150,21 @@ Identified :: Party -> IdentifiedState
 data NetworkState
 NetworkConnected :: NetworkState
 NetworkDisconnected :: NetworkState
+
+-- | Synchronization status of the hydra node to the cardano chain.
+data ChainSyncedStatus
+InSync :: ChainSyncedStatus
+CatchingUp :: ChainSyncedStatus
 data PeerStatus
 PeerIsConnected :: PeerStatus
 PeerIsDisconnected :: PeerStatus
 PeerIsUnknown :: PeerStatus
 data Connection
-Connection :: IdentifiedState -> [(Host, PeerStatus)] -> Maybe NetworkState -> HeadState -> Connection
+Connection :: IdentifiedState -> [(Host, PeerStatus)] -> Maybe NetworkState -> ChainSyncedStatus -> HeadState -> Connection
 [$sel:me:Connection] :: Connection -> IdentifiedState
 [$sel:peers:Connection] :: Connection -> [(Host, PeerStatus)]
 [$sel:networkState:Connection] :: Connection -> Maybe NetworkState
+[$sel:chainSyncedStatus:Connection] :: Connection -> ChainSyncedStatus
 [$sel:headState:Connection] :: Connection -> HeadState
 type UTxOCheckboxForm e n = Form (Map TxIn (TxOut CtxUTxO, Bool)) e n
 type UTxORadioFieldForm e n = Form (TxIn, TxOut CtxUTxO) e n
@@ -256,6 +262,7 @@ peersL :: Lens' Connection [(Host, PeerStatus)]
 networkStateL :: Lens' Connection (Maybe NetworkState)
 meL :: Lens' Connection IdentifiedState
 headStateL :: Lens' Connection HeadState
+chainSyncedStatusL :: Lens' Connection ChainSyncedStatus
 remainingPartiesL :: Lens' InitializingState [Party]
 initializingScreenL :: Lens' InitializingState InitializingScreen
 activeLinkL :: Traversal' HeadState ActiveLink
@@ -324,6 +331,7 @@ drawHeadParticipants :: IdentifiedState -> [Party] -> Widget n
 drawIfConnected :: (Connection -> Widget n) -> ConnectedState -> Widget n
 drawIfActive :: (ActiveLink -> Widget n) -> HeadState -> Widget n
 drawNetworkState :: ConnectedState -> Widget n
+drawChainSyncedState :: ConnectedState -> Widget n
 drawPeers :: ConnectedState -> [(Host, PeerStatus)] -> Widget n
 drawHeadId :: HeadId -> Widget n
 drawMyAddress :: AddressInEra -> Widget n
@@ -338,5 +346,9 @@ showHeadState :: HeadState -> String
 drawUTxO :: (AddressInEra -> Widget n) -> UTxO -> Widget n
 
 module Hydra.TUI
+
+-- | Construct a <a>CardanoClient</a> handle.
+mkCardanoClient :: NetworkId -> SocketPath -> CardanoClient
+mkBFClient :: NetworkId -> FilePath -> CardanoClient
 runWithVty :: IO Vty -> Options -> IO RootState
 run :: Options -> IO RootState
